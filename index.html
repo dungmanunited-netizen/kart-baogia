@@ -55,12 +55,8 @@
   </div>
 
 <script>
-// ====== CẤU HÌNH: dán đúng link /exec của web app (Deploy -> Manage deployments -> Web app URL) ======
-const EXEC_URL = 'https://script.google.com/macros/s/AKfycbwJ3JLmqJllAKa9CqRM0k0xdJGprUMt20ifpXnoW-xFu_2wePO1Bm4KCuHiX0-5CIcExA/exec';
-
-const $ = id => document.getElementById(id);
-$('#open-direct').href = EXEC_URL;
-</script>
+  // ====== CẤU HÌNH: dán đúng link /exec của web app (Deploy → Manage deployments → Web app URL) ======
+  const EXEC_URL = 'https://script.google.com/macros/s/AKfycbwJ3JLmqJllAKa9CqRM0k0xdJGprUMt20ifpXnoW-xFu_2wePO1Bm4KCuHiX0-5CIcExA/exec';
 
   const $ = id => document.getElementById(id);
   $('open-direct').href = EXEC_URL;
@@ -79,6 +75,9 @@ $('#open-direct').href = EXEC_URL;
   window.addEventListener('offline', () => show('offline'));
   start();
 
+  // Service worker: chỉ lưu vỏ ứng dụng (icon, trang chờ) để mở nhanh; KHÔNG lưu dữ liệu báo giá
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+</script>
   // Service worker: chỉ lưu vỏ ứng dụng (icon, trang chờ) để mở nhanh; KHÔNG lưu dữ liệu báo giá
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
 </script>
