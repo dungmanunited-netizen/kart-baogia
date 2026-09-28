@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<!-- KART – Báo giá vận tải: vỏ ứng dụng (PWA) cho iPhone/Android. Nội dung thật chạy trong web app Google Apps Script. -->
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kart Báo giá</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Kart Báo giá">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#F1F4F3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0E1417" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="favicon-32.png" sizes="32x32">
+<style>
+  /* ====== CẤU HÌNH: link /exec của web app Apps Script (Deploy → Manage deployments → Web app URL) ====== */
+  :root{ --bg:#F1F4F3; --ink:#15202A; --accent:#0E5B6D; --muted:#5A6770; }
+  @media (prefers-color-scheme: dark){ :root{ --bg:#0E1417; --ink:#E4EBED; --accent:#5BB6C8; --muted:#93A2A9; } }
+  html,body{ margin:0; height:100%; background:var(--bg); color:var(--ink); font:15px/1.45 -apple-system,system-ui,"Segoe UI",Roboto,Arial,sans-serif; }
+  body{ padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); box-sizing:border-box; overflow:hidden; }
+  #app{ position:fixed; top:env(safe-area-inset-top); left:env(safe-area-inset-left); right:env(safe-area-inset-right); bottom:env(safe-area-inset-bottom); border:0; width:calc(100% - env(safe-area-inset-left) - env(safe-area-inset-right)); height:calc(100% - env(safe-area-inset-top) - env(safe-area-inset-bottom)); background:var(--bg); }
+  .screen{ position:fixed; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; padding:24px; text-align:center; background:var(--bg); }
+  .screen img{ width:96px; height:96px; border-radius:22px; box-shadow:0 2px 10px rgba(0,0,0,.15); }
+  .screen p{ margin:0; max-width:420px; color:var(--muted); }
+  .screen b{ color:var(--ink); }
+  .btn{ appearance:none; border:0; border-radius:10px; padding:12px 18px; font:600 15px/1 inherit; background:var(--accent); color:#fff; text-decoration:none; }
+  .btn.ghost{ background:transparent; color:var(--accent); border:1px solid var(--accent); }
+  .spin{ width:28px; height:28px; border:3px solid rgba(127,127,127,.25); border-top-color:var(--accent); border-radius:50%; animation:s 0.9s linear infinite; }
+  @keyframes s{ to{ transform:rotate(360deg) } }
+  [hidden]{ display:none !important; }
+</style>
+</head>
+<body>
+  <iframe id="app" title="Kart – Báo giá vận tải" allow="clipboard-read; clipboard-write" referrerpolicy="no-referrer-when-downgrade"></iframe>
+
+  <div class="screen" id="loading">
+    <img src="icon-180.png" alt="">
+    <div class="spin" aria-hidden="true"></div>
+    <p>Đang mở <b>Kart Báo giá</b>…</p>
+  </div>
+
+  <div class="screen" id="offline" hidden>
+    <img src="icon-180.png" alt="">
+    <p><b>Không có kết nối mạng</b><br>Tool báo giá cần Internet để lấy giá, tỷ giá Vietcombank và xuất file. Kiểm tra Wi-Fi/4G rồi thử lại.</p>
+    <button class="btn" type="button" onclick="location.reload()">Thử lại</button>
+  </div>
+
+  <div class="screen" id="slow" hidden>
+    <img src="icon-180.png" alt="">
+    <p><b>Tool mở chậm hơn bình thường</b><br>Có thể do mạng yếu hoặc trình duyệt chặn nội dung nhúng.</p>
+    <button class="btn" type="button" onclick="location.reload()">Thử lại</button>
+    <a class="btn ghost" id="open-direct" target="_blank" rel="noopener">Mở trực tiếp trong Safari</a>
+  </div>
+
+<script>
+  // ====== CẤU HÌNH: dán đúng link /exec của web app (Deploy → Manage deployments → Web app URL) ======
+  https://script.google.com/macros/s/AKfycbyi4UYeWHfWPU-gEzG1ON9f5wra78lZpAUZFcYKn6Ni/dev
+
+  const $ = id => document.getElementById(id);
+  $('open-direct').href = EXEC_URL;
+  function show(id){ ['loading','offline','slow'].forEach(k => $(k).hidden = k !== id); }
+
+  function start(){
+    if (!navigator.onLine){ show('offline'); return; }
+    show('loading');
+    const f = $('app');
+    let done = false;
+    f.onload = () => { done = true; ['loading','offline','slow'].forEach(k => $(k).hidden = true); };
+    f.src = EXEC_URL;
+    setTimeout(() => { if (!done) show('slow'); }, 20000);   // quá 20 giây chưa mở được → gợi ý thử lại / mở trực tiếp
+  }
+  window.addEventListener('online', () => { if (!$('offline').hidden) start(); });
+  window.addEventListener('offline', () => show('offline'));
+  start();
+
+  // Service worker: chỉ lưu vỏ ứng dụng (icon, trang chờ) để mở nhanh; KHÔNG lưu dữ liệu báo giá
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+</script>
+</body>
+</html>
