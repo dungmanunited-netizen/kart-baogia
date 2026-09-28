@@ -55,8 +55,12 @@
   </div>
 
 <script>
-  // ====== CẤU HÌNH: dán đúng link /exec của web app (Deploy → Manage deployments → Web app URL) ======
-  https://script.google.com/macros/s/AKfycbyi4UYeWHfWPU-gEzG1ON9f5wra78lZpAUZFcYKn6Ni/dev
+// ====== CẤU HÌNH: dán đúng link /exec của web app (Deploy -> Manage deployments -> Web app URL) ======
+const EXEC_URL = 'https://script.google.com/macros/s/AKfycbwJ3JLmqJllAKa9CqRM0k0xdJGprUMt20ifpXnoW-xFu_2wePO1Bm4KCuHiX0-5CIcExA/exec';
+
+const $ = id => document.getElementById(id);
+$('#open-direct').href = EXEC_URL;
+</script>
 
   const $ = id => document.getElementById(id);
   $('open-direct').href = EXEC_URL;
